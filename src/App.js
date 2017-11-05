@@ -3,10 +3,8 @@ import "./App.css";
 
 function TodoList(props) {
   const rows = [];
-  props.items.forEach(item => {
-    rows.push(
-      <ItemList keyId={item.id} title={item.title} complete={item.complete} />
-    );
+  props.items.forEach(currentItem => {
+    rows.push(<ItemList item={currentItem} />);
   });
 
   return <ul>{rows}</ul>;
@@ -35,15 +33,36 @@ class FiltersForm extends React.Component {
   }
 }
 
-function ItemList(props) {
-  if (props.complete) {
+class ItemList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      complete: props.item.complete
+    };
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    this.setState(prevState => ({
+      complete: true
+    }));
+  }
+
+  render() {
+    if (this.state.complete) {
+      return (
+        <li key={this.props.item.keyId} className="Item-Completed">
+          {this.props.item.title}
+        </li>
+      );
+    }
     return (
-      <li key={props.keyId} className="Item-Completed">
-        {props.title}
+      <li key={this.props.item.keyId} onClick={this.handleClick}>
+        {this.props.item.title}
       </li>
     );
   }
-  return <li key={props.keyId}>{props.title}</li>;
 }
 
 class TodoListFiltered extends Component {

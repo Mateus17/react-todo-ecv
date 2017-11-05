@@ -1,47 +1,46 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import TodoListFiltered from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 
 const ITEMS = [
   {
-    id: 1,
+    id: 0,
     title: "Learn Javascript",
     complete: true
   },
   {
-    id: 2,
+    id: 1,
     title: "Learn ES6",
     complete: true
   },
   {
-    id: 3,
+    id: 2,
     title: "Learn React",
     complete: true
   },
   {
-    id: 4,
+    id: 3,
     title: "Learn React Native",
     complete: false
   },
   {
-    id: 5,
+    id: 4,
     title: "Learn Nodejs",
     complete: false
   },
   {
-    id: 6,
+    id: 5,
     title: "Learn by doing",
     complete: false
   },
   {
-    id: 7,
+    id: 6,
     title: "Learn to teach",
     complete: false
   },
   {
-    id: 8,
+    id: 7,
     title: "Teach to learn",
     complete: false
   }
