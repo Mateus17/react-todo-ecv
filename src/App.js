@@ -4,7 +4,7 @@ import "./App.css";
 function TodoList(props) {
   const rows = [];
   props.items.forEach(currentItem => {
-    rows.push(<ItemList item={currentItem} />);
+    rows.push(<ItemList key={currentItem.id.toString()} item={currentItem} />);
   });
 
   return <ul>{rows}</ul>;
@@ -21,14 +21,56 @@ class AddItemListForm extends React.Component {
   }
 }
 
+const FILTERS = ["Tous", "Terminé", "À faire"];
+
+class InputFilters extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      active: props.filters[0]
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({ active: e.target.value });
+  }
+
+  render() {
+    const filters = this.props.filters;
+    const buttonFilter = filters.map(filter => (
+      <label key={filter}>
+        <input
+          type="radio"
+          value={filter}
+          name="todolistfilter"
+          className={this.state.active === filter ? "Filter-Active" : ""}
+          checked={this.state.active === filter}
+          onChange={this.handleChange}
+        />
+        {filter}
+      </label>
+    ));
+
+    return <div>{buttonFilter}</div>;
+  }
+}
+
 class FiltersForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleClick.bind(this);
+  }
+
+  handleClick() {}
+
   render() {
     return (
-      <div>
-        <button>Tous</button>
-        <button>Terminé</button>
-        <button>À faire</button>
-      </div>
+      <form>
+        <InputFilters filters={FILTERS} />
+      </form>
     );
   }
 }
@@ -44,24 +86,16 @@ class ItemList extends React.Component {
   }
 
   handleClick() {
-    this.setState(prevState => ({
+    this.setState({
       complete: true
-    }));
+    });
   }
 
   render() {
     if (this.state.complete) {
-      return (
-        <li key={this.props.item.keyId} className="Item-Completed">
-          {this.props.item.title}
-        </li>
-      );
+      return <li className="Item-Completed">{this.props.item.title}</li>;
     }
-    return (
-      <li key={this.props.item.keyId} onClick={this.handleClick}>
-        {this.props.item.title}
-      </li>
-    );
+    return <li onClick={this.handleClick}>{this.props.item.title}</li>;
   }
 }
 
