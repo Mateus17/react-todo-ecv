@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import TodoListFiltered from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 
-const ITEMS = [
+let ITEMS = [
   {
     id: 0,
     title: "Learn Javascript",
@@ -46,8 +46,10 @@ const ITEMS = [
   }
 ];
 
+const FILTERS = ["Tous", "Terminé", "À faire"];
+
 ReactDOM.render(
-  <TodoListFiltered items={ITEMS} />,
+  <TodoListFiltered items={ITEMS} filters={FILTERS} />,
   document.getElementById("root")
 );
 registerServiceWorker();

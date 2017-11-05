@@ -1,13 +1,61 @@
 import React, { Component } from "react";
 import "./App.css";
 
-function TodoList(props) {
-  const rows = [];
-  props.items.forEach(currentItem => {
-    rows.push(<ItemList key={currentItem.id.toString()} item={currentItem} />);
-  });
+function ItemListCheckStatus(currentItem, eventChange) {
+  return (
+    <ItemList
+      key={currentItem.id.toString()}
+      item={currentItem}
+      onChangeStatusComplete={eventChange}
+    />
+  );
+}
 
-  return <ul>{rows}</ul>;
+class TodoList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      allItems: this.props.items
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    //console.log(this.state.allItems[e].setState({ complete: true }));
+    //this.allItems[e.target.id].setState({ complete: true });
+    console.log(e);
+  }
+
+  render() {
+    const isDisplayed = this.props.isDisplayed;
+    const rowsCompleted = [];
+    const rowsTodo = [];
+    const rows = [];
+
+    this.props.items.forEach(currentItem => {
+      if (currentItem.complete) {
+        rowsCompleted.push(ItemListCheckStatus(currentItem, this.handleChange));
+      } else {
+        rowsTodo.push(ItemListCheckStatus(currentItem, this.handleChange));
+      }
+    });
+
+    if (isDisplayed === "Tous") {
+      rows.push(rowsCompleted, this.handleChange);
+      rows.push(rowsTodo, this.handleChange);
+    }
+
+    if (isDisplayed === "Terminé") {
+      rows.push(rowsCompleted, this.handleChange);
+    }
+
+    if (isDisplayed === "À faire") {
+      rows.push(rowsTodo);
+    }
+
+    return <ul>{rows}</ul>;
+  }
 }
 
 class AddItemListForm extends React.Component {
@@ -21,9 +69,68 @@ class AddItemListForm extends React.Component {
   }
 }
 
-const FILTERS = ["Tous", "Terminé", "À faire"];
+class FiltersForm extends React.Component {
+  constructor(props) {
+    super(props);
 
-class InputFilters extends React.Component {
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.props.onFilterChange(e.target.value);
+  }
+
+  render() {
+    const filters = this.props.filters;
+
+    const buttonFilter = filters.map(filter => (
+      <label key={filter}>
+        <input
+          type="radio"
+          value={filter}
+          name="todolistfilter"
+          className={
+            this.props.filterActivated === filter ? "Filter-Active" : ""
+          }
+          checked={this.props.filterActivated === filter}
+          onChange={this.props.onFilterChange}
+        />
+        {filter}
+      </label>
+    ));
+
+    return <form>{buttonFilter}</form>;
+  }
+}
+
+class ItemList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      complete: props.item.complete,
+      id: props.item.id
+    };
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e) {
+    this.setState({
+      complete: true
+    });
+
+    this.props.onChangeStatusComplete(this.state.id);
+  }
+
+  render() {
+    if (this.state.complete) {
+      return <li className="Item-Completed">{this.props.item.title}</li>;
+    }
+    return <li onClick={this.handleClick}>{this.props.item.title}</li>;
+  }
+}
+
+class TodoListFiltered extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,74 +145,15 @@ class InputFilters extends React.Component {
   }
 
   render() {
-    const filters = this.props.filters;
-    const buttonFilter = filters.map(filter => (
-      <label key={filter}>
-        <input
-          type="radio"
-          value={filter}
-          name="todolistfilter"
-          className={this.state.active === filter ? "Filter-Active" : ""}
-          checked={this.state.active === filter}
-          onChange={this.handleChange}
-        />
-        {filter}
-      </label>
-    ));
-
-    return <div>{buttonFilter}</div>;
-  }
-}
-
-class FiltersForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.handleClick.bind(this);
-  }
-
-  handleClick() {}
-
-  render() {
-    return (
-      <form>
-        <InputFilters filters={FILTERS} />
-      </form>
-    );
-  }
-}
-
-class ItemList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      complete: props.item.complete
-    };
-
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
-    this.setState({
-      complete: true
-    });
-  }
-
-  render() {
-    if (this.state.complete) {
-      return <li className="Item-Completed">{this.props.item.title}</li>;
-    }
-    return <li onClick={this.handleClick}>{this.props.item.title}</li>;
-  }
-}
-
-class TodoListFiltered extends Component {
-  render() {
     return (
       <div className="Todo-List-Filtered">
         <AddItemListForm />
-        <TodoList items={this.props.items} />
-        <FiltersForm />
+        <TodoList items={this.props.items} isDisplayed={this.state.active} />
+        <FiltersForm
+          filters={this.props.filters}
+          onFilterChange={this.handleChange}
+          filterActivated={this.state.active}
+        />
       </div>
     );
   }
