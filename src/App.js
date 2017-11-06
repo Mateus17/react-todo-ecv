@@ -74,7 +74,7 @@ class AddItemListForm extends React.Component {
           value={this.state.value || ""}
           onChange={this.handleChange}
         />
-        <input type="Submit" value="Ajouter" />
+        <input type="submit" value="Ajouter" />
       </form>
     );
   }
