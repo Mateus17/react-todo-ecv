@@ -71,7 +71,7 @@ class AddItemListForm extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <input
           type="text"
-          value={this.state.value || ""}
+          value={this.state.value}
           onChange={this.handleChange}
         />
         <input type="submit" value="Ajouter" />
@@ -95,22 +95,29 @@ class FiltersForm extends React.Component {
     const filters = this.props.filters;
 
     const buttonFilter = filters.map(filter => (
-      <label key={filter}>
+      <label
+        key={filter}
+        className={
+          this.props.filterActivated === filter ? (
+            "Filter-Label Filter-Active"
+          ) : (
+            "Filter-Label"
+          )
+        }
+      >
         <input
           type="radio"
           value={filter}
           name="todolistfilter"
-          className={
-            this.props.filterActivated === filter ? "Filter-Active" : ""
-          }
           checked={this.props.filterActivated === filter}
           onChange={this.props.onFilterChange}
+          className="Hidden-Everywhere"
         />
         {filter}
       </label>
     ));
 
-    return <form>{buttonFilter}</form>;
+    return <form>Filtres : {buttonFilter}</form>;
   }
 }
 
@@ -136,7 +143,11 @@ class ItemList extends React.Component {
     if (this.state.complete) {
       return <li className="Item-Completed">{this.props.item.title}</li>;
     }
-    return <li onClick={this.handleClick}>{this.props.item.title}</li>;
+    return (
+      <li className="Item-Todo" onClick={this.handleClick}>
+        {this.props.item.title}
+      </li>
+    );
   }
 }
 
@@ -145,7 +156,7 @@ class TodoListFiltered extends Component {
     super(props);
     this.state = {
       active: props.filters[0],
-      items: props.items
+      items: []
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -172,6 +183,14 @@ class TodoListFiltered extends Component {
   onChangeStatus(e) {
     this.setState(prevState => {
       return (prevState.items[e].complete = true);
+    });
+  }
+
+  componentDidMount() {
+    const ITEMS = require("./data/todos.json");
+
+    this.setState({
+      items: ITEMS
     });
   }
 
