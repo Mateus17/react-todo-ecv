@@ -14,55 +14,66 @@ function ItemListCheckStatus(currentItem, eventChange) {
 class TodoList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      allItems: this.props.items
-    };
 
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(e) {
-    //console.log(this.state.allItems[e].setState({ complete: true }));
-    //this.allItems[e.target.id].setState({ complete: true });
-    console.log(e);
+    this.props.onChangeStatusComplete(e);
   }
 
   render() {
     const isDisplayed = this.props.isDisplayed;
-    const rowsCompleted = [];
-    const rowsTodo = [];
     const rows = [];
 
     this.props.items.forEach(currentItem => {
-      if (currentItem.complete) {
-        rowsCompleted.push(ItemListCheckStatus(currentItem, this.handleChange));
-      } else {
-        rowsTodo.push(ItemListCheckStatus(currentItem, this.handleChange));
+      if (isDisplayed === "Tous") {
+        rows.push(ItemListCheckStatus(currentItem, this.handleChange));
+      } else if (isDisplayed === "Terminé") {
+        if (currentItem.complete) {
+          rows.push(ItemListCheckStatus(currentItem, this.handleChange));
+        }
+      } else if (isDisplayed === "À faire") {
+        if (!currentItem.complete) {
+          rows.push(ItemListCheckStatus(currentItem, this.handleChange));
+        }
       }
     });
-
-    if (isDisplayed === "Tous") {
-      rows.push(rowsCompleted, this.handleChange);
-      rows.push(rowsTodo, this.handleChange);
-    }
-
-    if (isDisplayed === "Terminé") {
-      rows.push(rowsCompleted, this.handleChange);
-    }
-
-    if (isDisplayed === "À faire") {
-      rows.push(rowsTodo);
-    }
 
     return <ul>{rows}</ul>;
   }
 }
 
 class AddItemListForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: this.props.items,
+      value: ""
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({ value: e.target.value });
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.onFormSubmit(this.state.value);
+    this.setState({ value: "" });
+  }
+
   render() {
     return (
-      <form>
-        <input type="text" value="" />
+      <form onSubmit={this.handleSubmit}>
+        <input
+          type="text"
+          value={this.state.value || ""}
+          onChange={this.handleChange}
+        />
         <input type="Submit" value="Ajouter" />
       </form>
     );
@@ -118,7 +129,6 @@ class ItemList extends React.Component {
     this.setState({
       complete: true
     });
-
     this.props.onChangeStatusComplete(this.state.id);
   }
 
@@ -134,21 +144,49 @@ class TodoListFiltered extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      active: props.filters[0]
+      active: props.filters[0],
+      items: props.items
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeStatus = this.onChangeStatus.bind(this);
   }
 
   handleChange(e) {
     this.setState({ active: e.target.value });
   }
 
+  handleSubmit(value) {
+    const newItem = {
+      id: this.state.items.length,
+      title: value,
+      complete: false
+    };
+
+    this.setState({
+      items: [...this.state.items, newItem]
+    });
+  }
+
+  onChangeStatus(e) {
+    this.setState(prevState => {
+      return (prevState.items[e].complete = true);
+    });
+  }
+
   render() {
     return (
       <div className="Todo-List-Filtered">
-        <AddItemListForm />
-        <TodoList items={this.props.items} isDisplayed={this.state.active} />
+        <AddItemListForm
+          onFormSubmit={this.handleSubmit}
+          items={this.state.items}
+        />
+        <TodoList
+          items={this.state.items}
+          isDisplayed={this.state.active}
+          onChangeStatusComplete={this.onChangeStatus}
+        />
         <FiltersForm
           filters={this.props.filters}
           onFilterChange={this.handleChange}

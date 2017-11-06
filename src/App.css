@@ -1,3 +1,9 @@
 .Item-Completed {
   text-decoration: line-through;
+  color: limegreen;
+}
+
+.Todo-List-Filtered {
+  display: table;
+  margin: auto;
 }
